@@ -29,8 +29,15 @@ def add_expense():
 
 @app.route("/expenses", methods=["GET"])
 def get_expenses():
+    category = request.args.get("category")
+
     conn = get_connection()
-    rows = conn.execute("SELECT * FROM expenses").fetchall()
+    if category:
+        rows = conn.execute(
+            "SELECT * FROM expenses WHERE category = ?", (category,)
+        ).fetchall()
+    else:
+        rows = conn.execute("SELECT * FROM expenses").fetchall()
     conn.close()
 
     expenses = [dict(row) for row in rows]
