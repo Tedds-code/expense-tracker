@@ -27,5 +27,14 @@ def add_expense():
 
     return jsonify({"message": "Expense added successfully"}), 201
 
+@app.route("/expenses", methods=["GET"])
+def get_expenses():
+    conn = get_connection()
+    rows = conn.execute("SELECT * FROM expenses").fetchall()
+    conn.close()
+
+    expenses = [dict(row) for row in rows]
+    return jsonify(expenses), 200
+
 if __name__ == "__main__":
     app.run(debug=True)
