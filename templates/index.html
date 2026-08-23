@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Expense Tracker</title>
+    <style>
+        body { font-family: sans-serif; max-width: 600px; margin: 40px auto; }
+        input, select { margin: 4px; padding: 6px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
+        button { cursor: pointer; }
+    </style>
+</head>
+<body>
+    <h1>Expense Tracker</h1>
+
+    <h2>Add Expense</h2>
+    <input type="number" id="amount" placeholder="Amount" step="0.01">
+    <input type="text" id="category" placeholder="Category">
+    <input type="text" id="description" placeholder="Description (optional)">
+    <input type="date" id="date">
+    <button onclick="addExpense()">Add</button>
+
+    <h2>Filter by Category</h2>
+    <input type="text" id="filterCategory" placeholder="Category">
+    <button onclick="loadExpenses()">Filter</button>
+    <button onclick="clearFilter()">Clear Filter</button>
+
+    <table id="expenseTable">
+        <thead>
+            <tr><th>ID</th><th>Amount</th><th>Category</th><th>Description</th><th>Date</th><th></th></tr>
+        </thead>
+        <tbody id="expenseRows"></tbody>
+    </table>
+
+    <script>
+        async function loadExpenses() {
+            const category = document.getElementById("filterCategory").value;
+            const url = category ? `/expenses?category=${category}` : "/expenses";
+            const response = await fetch(url);
+            const expenses = await response.json();
+
+            const rows = document.getElementById("expenseRows");
+            rows.innerHTML = "";
+            expenses.forEach(exp => {
+                rows.innerHTML += `
+                    <tr>
+                        <td>${exp.id}</td>
+                        <td>${exp.amount}</td>
+                        <td>${exp.category}</td>
+                        <td>${exp.description}</td>
+                        <td>${exp.date}</td>
+                        <td><button onclick="deleteExpense(${exp.id})">Delete</button></td>
+                    </tr>
+                `;
+            });
+        }
+
+        async function addExpense() {
+            const amount = parseFloat(document.getElementById("amount").value);
+            const category = document.getElementById("category").value;
+            const description = document.getElementById("description").value;
+            const date = document.getElementById("date").value;
+
+            const response = await fetch("/expenses", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ amount, category, description, date })
+            });
+
+            if (!response.ok) {
+                const error = await response.json();
+                alert(error.error);
+                return;
+            }
+
+            document.getElementById("amount").value = "";
+            document.getElementById("category").value = "";
+            document.getElementById("description").value = "";
+            document.getElementById("date").value = "";
+            loadExpenses();
+        }
+
+        async function deleteExpense(id) {
+            await fetch(`/expenses/${id}`, { method: "DELETE" });
+            loadExpenses();
+        }
+
+        function clearFilter() {
+            document.getElementById("filterCategory").value = "";
+            loadExpenses();
+        }
+
+        loadExpenses();
+    </script>
+</body>
+</html>

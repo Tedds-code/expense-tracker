@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, render_template
 from database import init_db, get_connection
 
 app = Flask(__name__)
@@ -6,7 +6,7 @@ init_db()
 
 @app.route("/")
 def home():
-    return "Expense tracker is running!"
+    return render_template("index.html")
 
 @app.route("/expenses", methods=["POST"])
 def add_expense():
