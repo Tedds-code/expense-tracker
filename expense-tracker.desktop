@@ -1,0 +1,8 @@
+[Desktop Entry]
+Name=Expense Tracker
+Comment=Personal expense tracking app
+Exec=/home/tedd/Documents/Python/expense-tracker/run.sh
+Icon=/home/tedd/Documents/Python/expense-tracker/icon.png
+Terminal=false
+Type=Application
+Categories=Utility;
