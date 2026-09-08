@@ -10,4 +10,4 @@ if __name__ == "__main__":
     flask_thread.start()
 
     webview.create_window("Expense Tracker", "http://127.0.0.1:5000")
-    webview.start()
+    webview.start(icon="icon.png")
