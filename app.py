@@ -45,14 +45,31 @@ def add_expense():
 @app.route("/expenses", methods=["GET"])
 def get_expenses():
     category = request.args.get("category")
+    year = request.args.get("year")
+    month = request.args.get("month")
+    day = request.args.get("day")
+
+    query = "SELECT * FROM expenses WHERE 1=1"
+    params = []
+
+    if category:
+        query += " AND category = ?"
+        params.append(category)
+
+    if year:
+        query += " AND strftime('%Y', date) = ?"
+        params.append(year.zfill(4))
+
+    if month:
+        query += " AND strftime('%m', date) = ?"
+        params.append(month.zfill(2))
+
+    if day:
+        query += " AND strftime('%d', date) = ?"
+        params.append(day.zfill(2))
 
     conn = get_connection()
-    if category:
-        rows = conn.execute(
-            "SELECT * FROM expenses WHERE category = ?", (category,)
-        ).fetchall()
-    else:
-        rows = conn.execute("SELECT * FROM expenses").fetchall()
+    rows = conn.execute(query, params).fetchall()
     conn.close()
 
     expenses = [dict(row) for row in rows]

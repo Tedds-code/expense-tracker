@@ -88,3 +88,24 @@ def test_delete_expense(client):
 def test_delete_nonexistent_expense(client):
     response = client.delete("/expenses/999")
     assert response.status_code == 404
+
+
+def test_filter_by_year(client):
+    client.post("/expenses", json={"amount": 10, "category": "food", "date": "2026-08-21"})
+    client.post("/expenses", json={"amount": 20, "category": "food", "date": "2025-01-01"})
+
+    response = client.get("/expenses?year=2026")
+    data = response.get_json()
+    assert len(data) == 1
+    assert data[0]["date"] == "2026-08-21"
+
+
+def test_filter_by_category_and_month(client):
+    client.post("/expenses", json={"amount": 10, "category": "food", "date": "2026-08-21"})
+    client.post("/expenses", json={"amount": 20, "category": "transport", "date": "2026-08-15"})
+    client.post("/expenses", json={"amount": 30, "category": "food", "date": "2026-09-01"})
+
+    response = client.get("/expenses?category=food&month=08")
+    data = response.get_json()
+    assert len(data) == 1
+    assert data[0]["amount"] == 10
