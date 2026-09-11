@@ -9,11 +9,14 @@ the basics of python needed for real world application, as well as a personal ex
 
 The project includes the following functions of:
     • adding items
-    • filtering according to category
+    • filtering according to category, year, month, day, or any combination
+    • calculating the total amount for the expenses on screen
     • deleting items
     • viewing items in a graphical environment
     • checking for input validity
-
+    
+     
+    
 ## Tech stack:
 
 Python, Flask, SQLite, pywebview, pytest
@@ -86,6 +89,7 @@ What's covered:
 - Listing all expenses
 - Filtering expenses by category
 - Deleting expenses, including handling requests for IDs that don't exist
+- Filtering by year, month, day, and combinations of category and date filters
 
 Tests run against a separate test database that is created and 
 deleted automatically after each test. Your real expense data is never 
@@ -94,12 +98,19 @@ touched.
 
 ## API Endpoints
 
-| Method | Endpoint                  | Description                           |
-|--------|---------------------------|---------------------------------------|
-| GET    | /expenses                 | List all expenses                     |
-| GET    | /expenses?category=<name> | List expenses filtered by category    |
-| POST   | /expenses                 | Create a new expense                  |
-| DELETE | /expenses/<id>            | Delete an expense by its ID           |
+| Method | Endpoint                                         | Description                                         |
+|--------|--------------------------------------------------|-----------------------------------------------------|
+| GET    | /expenses                                        | List all expenses                                   |
+| GET    | /expenses?category=<name>                        | List expenses filtered by category                  |
+| POST   | /expenses                                        | Create a new expense                                |
+| DELETE | /expenses/<id>                                   | Delete an expense by its ID                         |
+| GET    | /expenses                                        | List all expenses                                   |
+| GET    | /expenses?category=<name>                        | Filter by category                                  |
+| GET    | /expenses?year=<yyyy>                            | Filter by year                                      |
+| GET    | /expenses?month=<mm>                             | Filter by month                                     |
+| GET    | /expenses?day=<dd>                               | Filter by day                                       |
+| GET    | /expenses?category=<name>&year=<yyyy>&month=<mm> | Any combination of filters can be used together     |
+
 
 ### POST /expenses — request body
 
@@ -126,13 +137,9 @@ be a positive number.
 
 ## Future improvements
 
-    • Filtering by month, day or year
-    • Total expenses 
-    • Total expenses of filtered results
     • Windows desktop launcher 
 
 
 ## Author 
 
 Theodore Christopoulos
-Press here for my Github page
