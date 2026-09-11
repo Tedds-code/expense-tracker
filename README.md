@@ -138,6 +138,7 @@ be a positive number.
 ## Future improvements
 
     • Windows desktop launcher 
+	• pie chart / bar chart for the percentage of the total spent per category
 
 
 ## Author 
