@@ -34,6 +34,8 @@
         </thead>
         <tbody id="expenseRows"></tbody>
     </table>
+	
+	<h3>Total: $<span id="totalAmount">0.00</span></h3>
 
     <script>
         async function loadExpenses() {
@@ -54,6 +56,8 @@
 
             const rows = document.getElementById("expenseRows");
             rows.innerHTML = "";
+            let total = 0;
+
             expenses.forEach(exp => {
                 rows.innerHTML += `
                     <tr>
@@ -65,7 +69,10 @@
                         <td><button onclick="deleteExpense(${exp.id})">Delete</button></td>
                     </tr>
                 `;
+                total += exp.amount;
             });
+
+            document.getElementById("totalAmount").textContent = total.toFixed(2);
         }
 
         function clearFilter() {
