@@ -20,10 +20,13 @@
     <input type="date" id="date">
     <button onclick="addExpense()">Add</button>
 
-    <h2>Filter by Category</h2>
+    <h2>Filter Expenses</h2>
     <input type="text" id="filterCategory" placeholder="Category">
+    <input type="number" id="filterYear" placeholder="Year (e.g. 2026)">
+    <input type="number" id="filterMonth" placeholder="Month (1-12)">
+    <input type="number" id="filterDay" placeholder="Day (1-31)">
     <button onclick="loadExpenses()">Filter</button>
-    <button onclick="clearFilter()">Clear Filter</button>
+    <button onclick="clearFilter()">Clear Filters</button>
 
     <table id="expenseTable">
         <thead>
@@ -35,7 +38,17 @@
     <script>
         async function loadExpenses() {
             const category = document.getElementById("filterCategory").value;
-            const url = category ? `/expenses?category=${category}` : "/expenses";
+            const year = document.getElementById("filterYear").value;
+            const month = document.getElementById("filterMonth").value;
+            const day = document.getElementById("filterDay").value;
+
+            const params = new URLSearchParams();
+            if (category) params.append("category", category);
+            if (year) params.append("year", year);
+            if (month) params.append("month", month);
+            if (day) params.append("day", day);
+
+            const url = params.toString() ? `/expenses?${params.toString()}` : "/expenses";
             const response = await fetch(url);
             const expenses = await response.json();
 
@@ -55,6 +68,13 @@
             });
         }
 
+        function clearFilter() {
+            document.getElementById("filterCategory").value = "";
+            document.getElementById("filterYear").value = "";
+            document.getElementById("filterMonth").value = "";
+            document.getElementById("filterDay").value = "";
+            loadExpenses();
+        }
         async function addExpense() {
             const amount = parseFloat(document.getElementById("amount").value);
             const category = document.getElementById("category").value;
@@ -85,10 +105,6 @@
             loadExpenses();
         }
 
-        function clearFilter() {
-            document.getElementById("filterCategory").value = "";
-            loadExpenses();
-        }
 
         loadExpenses();
     </script>
