@@ -36,44 +36,102 @@
     </table>
 	
 	<h3>Total: $<span id="totalAmount">0.00</span></h3>
+	
+    <h3>Spending by Category</h3>
+    <canvas id="categoryChart" width="300" height="300"></canvas>
+    <div id="chartLegend"></div>
 
     <script>
+		
+		const chartColors = [
+		    "#4e79a7", "#f28e2b", "#e15759", "#76b7b2", "#59a14f",
+		    "#edc948", "#b07aa1", "#ff9da7", "#9c755f", "#bab0ac"
+        ];
+
+		function drawPieChart(categoryTotals, total) {
+			const canvas = document.getElementById("categoryChart");
+			const ctx = canvas.getContext("2d");
+			ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+			const centerX = canvas.width / 2;
+			const centerY = canvas.height / 2;
+			const radius = Math.min(centerX, centerY) - 10;
+
+			let startAngle = -0.5 * Math.PI;
+			const legend = document.getElementById("chartLegend");
+			legend.innerHTML = "";
+
+			const categories = Object.keys(categoryTotals);
+
+			if (total === 0 || categories.length === 0) {
+				ctx.fillStyle = "#ccc";
+				ctx.fillText("No data to display", centerX - 40, centerY);
+				return;
+			}
+
+			categories.forEach((category, i) => {
+				const amount = categoryTotals[category];
+				const sliceAngle = (amount / total) * 2 * Math.PI;
+				const color = chartColors[i % chartColors.length];
+
+				ctx.beginPath();
+				ctx.moveTo(centerX, centerY);
+				ctx.arc(centerX, centerY, radius, startAngle, startAngle + sliceAngle);
+				ctx.closePath();
+				ctx.fillStyle = color;
+				ctx.fill();
+
+				startAngle += sliceAngle;
+
+				const percentage = ((amount / total) * 100).toFixed(1);
+				legend.innerHTML += `
+					<div style="display:flex; align-items:center; margin:2px 0;">
+						<div style="width:12px; height:12px; background:${color}; margin-right:6px;"></div>
+						<span>${category}: $${amount.toFixed(2)} (${percentage}%)</span>
+					</div>
+				`;
+			});
+		}
+		
         async function loadExpenses() {
-            const category = document.getElementById("filterCategory").value;
-            const year = document.getElementById("filterYear").value;
-            const month = document.getElementById("filterMonth").value;
-            const day = document.getElementById("filterDay").value;
+			const category = document.getElementById("filterCategory").value;
+			const year = document.getElementById("filterYear").value;
+			const month = document.getElementById("filterMonth").value;
+			const day = document.getElementById("filterDay").value;
 
-            const params = new URLSearchParams();
-            if (category) params.append("category", category);
-            if (year) params.append("year", year);
-            if (month) params.append("month", month);
-            if (day) params.append("day", day);
+			const params = new URLSearchParams();
+			if (category) params.append("category", category);
+			if (year) params.append("year", year);
+			if (month) params.append("month", month);
+			if (day) params.append("day", day);
 
-            const url = params.toString() ? `/expenses?${params.toString()}` : "/expenses";
-            const response = await fetch(url);
-            const expenses = await response.json();
+			const url = params.toString() ? `/expenses?${params.toString()}` : "/expenses";
+			const response = await fetch(url);
+			const expenses = await response.json();
 
-            const rows = document.getElementById("expenseRows");
-            rows.innerHTML = "";
-            let total = 0;
+			const rows = document.getElementById("expenseRows");
+			rows.innerHTML = "";
+			let total = 0;
+			const categoryTotals = {};
 
-            expenses.forEach(exp => {
-                rows.innerHTML += `
-                    <tr>
-                        <td>${exp.id}</td>
-                        <td>${exp.amount}</td>
-                        <td>${exp.category}</td>
-                        <td>${exp.description}</td>
-                        <td>${exp.date}</td>
-                        <td><button onclick="deleteExpense(${exp.id})">Delete</button></td>
-                    </tr>
-                `;
-                total += exp.amount;
-            });
+			expenses.forEach(exp => {
+				rows.innerHTML += `
+					<tr>
+						<td>${exp.id}</td>
+						<td>${exp.amount}</td>
+						<td>${exp.category}</td>
+						<td>${exp.description}</td>
+						<td>${exp.date}</td>
+						<td><button onclick="deleteExpense(${exp.id})">Delete</button></td>
+					</tr>
+				`;
+				total += exp.amount;
+				categoryTotals[exp.category] = (categoryTotals[exp.category] || 0) + exp.amount;
+			});
 
-            document.getElementById("totalAmount").textContent = total.toFixed(2);
-        }
+			document.getElementById("totalAmount").textContent = total.toFixed(2);
+			drawPieChart(categoryTotals, total);
+		}
 
         function clearFilter() {
             document.getElementById("filterCategory").value = "";
