@@ -14,7 +14,7 @@ The project includes the following functions of:
     • deleting items
     • viewing items in a graphical environment
     • checking for input validity
-    
+    • pie chart and percentages of total expenses each chategory takes up
      
     
 ## Tech stack:
